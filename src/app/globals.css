@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@theme {
+  --color-darkBg: #0f0f0f;
+  --color-brandRed: #e60000;
+  --color-brandGray: #242424;
+}
+@layer base {
+  body {
+    background-color: var(--color-darkBg);
+    color: white;
+    overflow-x: hidden;
+  }
+}
+@layer components {
+  .brutal-border {
+    @apply border-2 border-[var(--color-brandGray)] hover:border-[var(--color-brandRed)] transition-colors duration-300;
+  }
+}
+
+@layers utilities {
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+
