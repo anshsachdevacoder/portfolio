@@ -3,11 +3,11 @@
 export default function AtAGlance() {
   const stats = [
     { value: "3+", label: "International", desc: "Global Events" },
-    { value: "15+", label: "National", desc: "Level Achievements" },
-    { value: "50+", label: "Inter-Uni", desc: "Participations" },
+    { value: "15+", label: "National", desc: "Participations" },
+    { value: "50+", label: "Inter-University", desc: "Participations" },
     { value: "30+", label: "Events", desc: "Organized (IITs/NITs)" },
     { value: "400+", label: "Mentored", desc: "Students Guided" },
-    { value: "70+", label: "Intra-Uni", desc: "Achievements" },
+    { value: "70+", label: "Intra-University", desc: "Participations + Achievements" },
   ];
   const hexPositions = [
     "top-[0%] left-[50%]",   

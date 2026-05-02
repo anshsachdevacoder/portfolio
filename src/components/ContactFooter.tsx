@@ -41,14 +41,14 @@ export default function ContactFooter() {
             </a>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <a 
-                href="mailto:ansh.sachdeva@example.com" 
+                href="https://www.linkedin.com/in/ansh-sachdeva-a-a14559289?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" 
                 className="group flex items-center gap-4 brutal-border bg-brandGray/10 p-4 hover:border-white transition-colors"
               >
                 <Mail size={24} className="text-brandRed group-hover:text-white" />
                 <span className="font-bold text-sm uppercase tracking-wider text-gray-300 group-hover:text-white">Email Me</span>
               </a>
               <a 
-                href="#" 
+                href="anshsachdeva.in@gmail.com" 
                 target="_blank" 
                 rel="noreferrer"
                 className="group flex items-center gap-4 brutal-border bg-brandGray/10 p-4 hover:border-white transition-colors"

@@ -36,7 +36,7 @@ export default function Skills() {
           Skill Set
         </h2>
         <p className="text-gray-400 mt-2 font-mono text-sm uppercase tracking-widest">
-          // Technical & Behavioral Stack
+          // Technical & Leadership Stack
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
