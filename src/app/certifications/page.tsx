@@ -2,8 +2,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase, Certificate } from "@/lib/supabase";
-
-// Added "Workshop" and "Courses" to the filters
 const FILTERS = ["All", "International", "National", "State", "Inter-University", "Intra-University", "Workshop", "Courses"];
 
 export default function CertificationsPage() {
@@ -44,9 +42,7 @@ export default function CertificationsPage() {
             A comprehensive ledger of awards, certifications, and verified achievements.
           </p>
         </div>
-        
-        {/* Filter Bar */}
-        <div className="flex flex-wrap gap-3 mb-12 border-y-2 border-brandGray py-6">
+                <div className="flex flex-wrap gap-3 mb-12 border-y-2 border-brandGray py-6">
           {FILTERS.map((filter) => (
             <button
               key={filter}
@@ -61,8 +57,6 @@ export default function CertificationsPage() {
             </button>
           ))}
         </div>
-
-        {/* Grid */}
         {loading ? (
           <div className="w-full h-64 flex items-center justify-center font-mono text-brandRed animate-pulse">
             [QUERYING_DATABASE...]
