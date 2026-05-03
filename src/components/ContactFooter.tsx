@@ -1,7 +1,5 @@
 "use client";
 import { Mail, MapPin, Link2, Terminal } from "lucide-react";
-
-// Custom LinkedIn SVG exactly matching the Lucide design style
 const LinkedinIcon = ({ className }: { className?: string }) => (
   <svg 
     xmlns="http://www.w3.org/2000/svg" 
@@ -46,9 +44,7 @@ export default function ContactFooter() {
           </div>
           
           <div className="flex flex-col justify-center space-y-6">
-            
-            {/* BIG COMMUNITY BUTTON */}
-            <a 
+                        <a 
               href="https://www.linkedin.com/in/ansh-sachdeva-a14559289/" 
               target="_blank" 
               rel="noreferrer"
@@ -65,18 +61,14 @@ export default function ContactFooter() {
             </a>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              
-              {/* EMAIL BUTTON */}
-              <a 
+                            <a 
                 href="mailto:anshsachdeva.in@gmail.com" 
                 className="group flex items-center gap-4 brutal-border bg-brandGray/10 p-4 hover:border-white transition-colors"
               >
                 <Mail size={24} className="text-brandRed group-hover:text-white" />
                 <span className="font-bold text-sm uppercase tracking-wider text-gray-300 group-hover:text-white">Email Me</span>
               </a>
-              
-              {/* LINKEDIN SECONDARY BUTTON (Using custom SVG) */}
-              <a 
+                            <a 
                 href="https://www.linkedin.com/in/ansh-sachdeva-a14559289/" 
                 target="_blank" 
                 rel="noreferrer"
