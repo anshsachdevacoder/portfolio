@@ -1,23 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Upload, Award, AlertTriangle, Database, Trash2, Edit3, X } from "lucide-react";
+import { Upload, Award, AlertTriangle, Database, Trash2, Edit3, X, Search, Filter } from "lucide-react";
 
 export default function CertificationsModule() {
   const [viewMode, setViewMode] = useState<"add" | "manage">("manage");
   const [certs, setCerts] = useState<any[]>([]);
   const [isFetching, setIsFetching] = useState(false);
-    const [editId, setEditId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [editId, setEditId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("National");
   const [organization, setOrganization] = useState("");
   const [verificationUrl, setVerificationUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [existingImageUrl, setExistingImageUrl] = useState("");
-  
   const [isUploading, setIsUploading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ text: string; type: "success" | "error" } | null>(null);
-
   const fetchAllCerts = async () => {
     setIsFetching(true);
     const { data, error } = await supabase.from('certificates').select('*').order('created_at', { ascending: false });
@@ -29,6 +29,12 @@ export default function CertificationsModule() {
     if (viewMode === "manage") fetchAllCerts();
   }, [viewMode]);
 
+  const filteredDisplayData = certs.filter((cert) => {
+    const matchesSearch = cert.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = filterCategory === "All" || cert.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   const handleDeployCert = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUploading(true);
@@ -36,18 +42,14 @@ export default function CertificationsModule() {
 
     try {
       let finalImageUrl = existingImageUrl;
-
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", "portfolio_uploads"); 
-        
         const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
         const cloudinaryRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
         const cloudinaryData = await cloudinaryRes.json();
-        
         if (!cloudinaryRes.ok) throw new Error("Cloudinary upload failed");
-        
         finalImageUrl = cloudinaryData.secure_url.replace("/upload/", "/upload/f_auto,q_auto,w_800/");
       }
 
@@ -68,7 +70,6 @@ export default function CertificationsModule() {
         if (error) throw error;
         setStatusMsg({ text: "NEW CERTIFICATION DEPLOYED", type: "success" });
       }
-
       resetForm();
       setViewMode("manage");
     } catch (error: any) {
@@ -124,12 +125,43 @@ export default function CertificationsModule() {
       )}
 
       {viewMode === "manage" && (
-        <div>
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="relative flex-grow">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <input 
+                type="text" 
+                placeholder="SEARCH_BY_CERTIFICATE_NAME" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-brandGray/10 brutal-border border-white/5 p-4 pl-12 text-sm font-mono text-white placeholder:text-gray-600 focus:outline-none focus:border-brandRed transition-colors"
+              />
+            </div>
+            <div className="relative min-w-[240px]">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={18} />
+              <select 
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="w-full bg-brandGray/10 brutal-border border-white/5 p-4 pl-12 text-sm font-mono text-white focus:outline-none focus:border-brandRed transition-colors uppercase appearance-none cursor-pointer"
+              >
+                <option value="All" className="bg-darkBg text-white">All Categories</option>
+                <option value="International" className="bg-darkBg text-white">International</option>
+                <option value="National" className="bg-darkBg text-white">National</option>
+                <option value="State" className="bg-darkBg text-white">State</option>
+                <option value="Inter-University" className="bg-darkBg text-white">Inter-University</option>
+                <option value="Intra-University" className="bg-darkBg text-white">Intra-University</option>
+                <option value="Workshop" className="bg-darkBg text-white">Workshop</option>
+                <option value="Courses" className="bg-darkBg text-white">Courses</option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 text-[10px]">▼</div>
+            </div>
+          </div>
+
           {isFetching ? (
             <div className="py-12 text-center font-mono text-brandRed animate-pulse">EXTRACTING_CERTIFICATE_ARCHIVES...</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certs.map(cert => (
+              {filteredDisplayData.map(cert => (
                 <div key={cert.id} className="brutal-border bg-brandGray/10 flex flex-col group relative overflow-hidden">
                   <div className="w-full h-40 bg-black relative border-b border-brandGray flex items-center justify-center overflow-hidden">
                     {cert.image_url ? (
@@ -155,7 +187,11 @@ export default function CertificationsModule() {
                   </div>
                 </div>
               ))}
-              {certs.length === 0 && <div className="col-span-full py-8 text-center text-gray-500 font-mono">NO_CERTIFICATES_FOUND</div>}
+              {filteredDisplayData.length === 0 && (
+                <div className="col-span-full py-12 text-center text-gray-500 font-mono uppercase border border-dashed border-brandGray">
+                  [NO_RECORDS_MATCH_QUERY]
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -169,39 +205,34 @@ export default function CertificationsModule() {
               <button type="button" onClick={() => {resetForm(); setViewMode("manage");}} className="hover:text-white"><X size={16}/></button>
             </div>
           )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="font-mono text-xs uppercase text-gray-400">Certification Title</label>
-              <input required type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm focus:outline-none focus:border-brandRed transition-colors" placeholder="Title" />
+              <input required type="text" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-brandRed transition-colors" placeholder="Title" />
             </div>
-
             <div className="space-y-2">
               <label className="font-mono text-xs uppercase text-gray-400">Classification Tier</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm focus:outline-none focus:border-brandRed transition-colors uppercase font-bold">
-                <option value="International">International</option>
-                <option value="National">National</option>
-                <option value="State">State</option>
-                <option value="Inter-University">Inter-University</option>
-                <option value="Intra-University">Intra-University</option>
-                <option value="Workshop">Workshop</option>
-                <option value="Courses">Courses</option>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-brandRed transition-colors uppercase font-bold cursor-pointer">
+                <option value="International" className="bg-darkBg text-white">International</option>
+                <option value="National" className="bg-darkBg text-white">National</option>
+                <option value="State" className="bg-darkBg text-white">State</option>
+                <option value="Inter-University" className="bg-darkBg text-white">Inter-University</option>
+                <option value="Intra-University" className="bg-darkBg text-white">Intra-University</option>
+                <option value="Workshop" className="bg-darkBg text-white">Workshop</option>
+                <option value="Courses" className="bg-darkBg text-white">Courses</option>
               </select>
             </div>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="font-mono text-xs uppercase text-gray-400">Issuing Organization</label>
-              <input required type="text" value={organization} onChange={(e) => setOrganization(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm focus:outline-none focus:border-brandRed transition-colors" placeholder="organization" />
+              <input required type="text" value={organization} onChange={(e) => setOrganization(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-brandRed transition-colors" placeholder="organization" />
             </div>
-
             <div className="space-y-2">
               <label className="font-mono text-xs uppercase text-gray-400">Verification URL (Optional)</label>
-              <input type="url" value={verificationUrl} onChange={(e) => setVerificationUrl(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm focus:outline-none focus:border-brandRed transition-colors" placeholder="https://..." />
+              <input type="url" value={verificationUrl} onChange={(e) => setVerificationUrl(e.target.value)} className="w-full bg-brandGray/20 brutal-border border-white/10 p-4 text-sm text-white focus:outline-none focus:border-brandRed transition-colors" placeholder="https://..." />
             </div>
           </div>
-
           <div className="space-y-2">
             <label className="font-mono text-xs uppercase text-gray-400">Visual Evidence (Image File)</label>
             <div className="relative border-2 border-dashed border-brandGray hover:border-brandRed transition-colors bg-brandGray/10 p-12 flex flex-col items-center justify-center cursor-pointer">
@@ -212,7 +243,6 @@ export default function CertificationsModule() {
               </span>
             </div>
           </div>
-
           <button disabled={isUploading} type="submit" className="w-full py-5 bg-brandRed text-white font-black uppercase tracking-widest text-sm hover:bg-white hover:text-brandRed transition-all duration-300 disabled:opacity-50 mt-8">
             {isUploading ? "OPTIMIZING & TRANSMITTING..." : editId ? "UPDATE RECORD" : "INJECT INTO DATABASE"}
           </button>
